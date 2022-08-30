@@ -132,3 +132,23 @@ module Model =
                         newMarking)
                 marking
             |> Some
+
+    /// Returns the complete state space of a model, starting from some marking.
+    let stateSpace (model: Model<'Place, 'Transition>) (marking: Marking<'Place>) : Set<Marking<'Place>> =
+        let getSuccessors marking =
+            getFireable model marking
+            |> Set.fold
+                (fun successors transition -> Set.add (fire model marking transition).Value successors)
+                Set.empty
+
+        let rec fixpoint space =
+            let space' =
+                space
+                |> Set.fold (fun newSpace marking -> Set.union newSpace (getSuccessors marking)) space
+
+            if space = space' then
+                space'
+            else
+                fixpoint space'
+
+        fixpoint (Set [ marking ])

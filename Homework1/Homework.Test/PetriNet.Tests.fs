@@ -1,4 +1,4 @@
-module Tests
+module PetriNet.Tests
 
 open Xunit
 open FsUnit.Xunit
