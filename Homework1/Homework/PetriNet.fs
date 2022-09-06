@@ -53,20 +53,20 @@ module Marking =
 
         repr[0 .. repr.Length - 3] + "}"
 
-// ----- ArcSet ----------------------------------------------------------------------------------------------------- //
+// ----- Arcs ------------------------------------------------------------------------------------------------------- //
 
 /// The pre- and post-condition functions of a Petri net are represented by sets of weighted arcs from places to
 /// transitions and from transitions to places, respectively.
-type ArcSet<'T, 'U when 'T: comparison and 'U: comparison> = private { Arcs: Map<'T * 'U, Token> }
+type Arcs<'T, 'U when 'T: comparison and 'U: comparison> = private { Arcs: Map<'T * 'U, Token> }
 
 [<RequireQualifiedAccess>]
-module ArcSet =
+module Arcs =
 
     /// Returns a new set of arcs built from a sequence of mappings from pairs of nodes to token counts.
-    let make (mappings: seq<('T * 'U) * Token>) : ArcSet<'T, 'U> = { Arcs = Map(mappings) }
+    let make (mappings: seq<('T * 'U) * Token>) : Arcs<'T, 'U> = { Arcs = Map(mappings) }
 
     /// Returns the token count associated with a pair of nodes in a set of arcs.
-    let find (arc: 'T * 'U) (set: ArcSet<'T, 'U>) : Token =
+    let find (arc: 'T * 'U) (set: Arcs<'T, 'U>) : Token =
         match Map.tryFind arc set.Arcs with
         | Some count -> count
         | None -> 0
@@ -79,14 +79,14 @@ type Model<'Place, 'Transition when 'Place: comparison and 'Transition: comparis
     private
         { Places: Set<'Place>
           Transitions: Set<'Transition>
-          Pre: ArcSet<'Place, 'Transition>
-          Post: ArcSet<'Transition, 'Place> }
+          Pre: Arcs<'Place, 'Transition>
+          Post: Arcs<'Transition, 'Place> }
 
 [<RequireQualifiedAccess>]
 module Model =
 
     /// Returns a new model built from pre- and post-condition functions expressed as sets of arcs.
-    let make (pre: ArcSet<'Place, 'Transition>) (post: ArcSet<'Transition, 'Place>) : Model<'Place, 'Transition> =
+    let make (pre: Arcs<'Place, 'Transition>) (post: Arcs<'Transition, 'Place>) : Model<'Place, 'Transition> =
         { Places = getAllCases<'Place> ()
           Transitions = getAllCases<'Transition> ()
           Pre = pre
@@ -103,7 +103,7 @@ module Model =
         model.Places
         |> Set.forall (fun place ->
             (Marking.find place marking)
-            - (ArcSet.find (place, transition) model.Pre)
+            - (Arcs.find (place, transition) model.Pre)
             >= 0)
 
     /// Returns the set of all the transitions that are fireable from a given marking in a model.
@@ -127,8 +127,8 @@ module Model =
                     Marking.update
                         place
                         ((Marking.find place marking)
-                         - (ArcSet.find (place, transition) model.Pre)
-                         + (ArcSet.find (transition, place) model.Post))
+                         - (Arcs.find (place, transition) model.Pre)
+                         + (Arcs.find (transition, place) model.Post))
                         newMarking)
                 marking
             |> Some

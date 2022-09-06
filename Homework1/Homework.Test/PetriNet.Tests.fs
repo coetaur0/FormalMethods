@@ -18,15 +18,15 @@ type Transition =
     | T3
 
 let pre =
-    ArcSet.make [ ((P1, T3), 1)
-                  ((P2, T3), 1)
-                  ((P3, T1), 1) ]
+    Arcs.make [ ((P1, T3), 1)
+                ((P2, T3), 1)
+                ((P3, T1), 1) ]
 
 let post =
-    ArcSet.make [ ((T1, P1), 1)
-                  ((T2, P1), 1)
-                  ((T2, P3), 1)
-                  ((T3, P2), 2) ]
+    Arcs.make [ ((T1, P1), 1)
+                ((T2, P1), 1)
+                ((T2, P3), 1)
+                ((T3, P2), 2) ]
 
 let model = Model.make pre post
 
