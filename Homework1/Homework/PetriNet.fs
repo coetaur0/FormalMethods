@@ -57,17 +57,17 @@ module Marking =
 
 /// The pre- and post-condition functions of a Petri net are represented by sets of weighted arcs from places to
 /// transitions and from transitions to places, respectively.
-type Arcs<'T, 'U when 'T: comparison and 'U: comparison> = private { Arcs: Map<'T * 'U, Token> }
+type Arcs<'T, 'U when 'T: comparison and 'U: comparison> = private { Values: Map<'T * 'U, Token> }
 
 [<RequireQualifiedAccess>]
 module Arcs =
 
     /// Returns a new set of arcs built from a sequence of mappings from pairs of nodes to token counts.
-    let make (mappings: seq<('T * 'U) * Token>) : Arcs<'T, 'U> = { Arcs = Map(mappings) }
+    let make (mappings: seq<('T * 'U) * Token>) : Arcs<'T, 'U> = { Values = Map(mappings) }
 
     /// Returns the token count associated with a pair of nodes in a set of arcs.
     let find (arc: 'T * 'U) (set: Arcs<'T, 'U>) : Token =
-        match Map.tryFind arc set.Arcs with
+        match Map.tryFind arc set.Values with
         | Some count -> count
         | None -> 0
 

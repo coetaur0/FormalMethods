@@ -24,7 +24,7 @@ let ``The initial marking of the binary counter model should be the state where 
     |> should equal 0
 
 [<Fact>]
-let ``The binary counter model should reach every state where its bits represent numbers from 0 to 7`` () =
+let ``The binary counter model should reach *every* state corresponding to numbers from 0 to 7`` () =
     for b0 in 0..1 do
         for b1 in 0..1 do
             for b2 in 0..1 do
@@ -37,5 +37,5 @@ let ``The binary counter model should reach every state where its bits represent
                 |> should be True
 
 [<Fact>]
-let ``The binary counter model should only reach the 8 states corresponding to numbers 0 to 7`` () =
+let ``The binary counter model should *only* reach the 8 states corresponding to numbers from 0 to 7`` () =
     stateSpace.Count |> should equal 8
