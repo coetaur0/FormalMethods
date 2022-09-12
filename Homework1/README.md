@@ -9,10 +9,10 @@ The submission deadline is set to **October the xth 202X, at 23:59 Geneva local 
 The firing semantics of Petri nets is formally described in the lecture notes. In this exercise, you will need to
 transcribe this formal description into a working F# implementation.
 
-In the file `Homework/PetriNet.fs`, fill out the missing implementation for the functions `Model.fireable`
+In the file `Homework/PetriNet.fs`, fill out the missing implementation for the functions `Model.isFireable`
 and `Model.getFireable`.
 
-### 1. `Model.fireable`:
+### 1. `Model.isFireable`:
 
 This function returns a boolean value indicating whether the `transition` it receives as input is fireable from
 some `marking` in a given `model`.
@@ -37,10 +37,10 @@ let post = Arcs.make [ ((P1, T1), 1) ]
 let model = Model.make pre post
 
 // The following call should return 'true', because transition T1 is fireable from marking {P1: 1, P2: 3}. 
-Model.fireable model (Marking.make [ (P1, 1); (P2, 3) ]) T1
+Model.isFireable model (Marking.make [ (P1, 1); (P2, 3) ]) T1
 
 // The following call should return 'false', because transition T1 is not fireable from marking {P1: 1, P2: 0}.
-Model.fireable model (Marking.make [ (P1, 1); (P2, 0) ]) T1 
+Model.isFireable model (Marking.make [ (P1, 1); (P2, 0) ]) T1 
 ```
 
 ### 2. `Model.getFireable`:

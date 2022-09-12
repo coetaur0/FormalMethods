@@ -33,7 +33,7 @@ let model = Model.make pre post
 // ----- Tests ------------------------------------------------------------------------------------------------------ //
 
 [<Fact>]
-let ``The 'Model.fireable' function should return true for transitions that are fireable`` () =
+let ``The 'Model.isFireable' function should return true for transitions that are fireable`` () =
     Model.isFireable model (Marking.make [ (P1, 1); (P3, 1) ]) T1
     |> should be True
 
@@ -52,7 +52,7 @@ let ``The 'Model.fireable' function should return true for transitions that are 
     |> should be True
 
 [<Fact>]
-let ``The 'Model.fireable' function should return false for transitions that aren't fireable`` () =
+let ``The 'Model.isFireable' function should return false for transitions that aren't fireable`` () =
     Model.isFireable model (Marking.make [ (P1, 1); (P2, 1) ]) T1
     |> should be False
 
