@@ -34,10 +34,10 @@ let model = Model.make pre post
 
 [<Fact>]
 let ``The 'Model.fireable' function should return true for transitions that are fireable`` () =
-    Model.fireable model (Marking.make [ (P1, 1); (P3, 1) ]) T1
+    Model.isFireable model (Marking.make [ (P1, 1); (P3, 1) ]) T1
     |> should be True
 
-    Model.fireable
+    Model.isFireable
         model
         (Marking.make [ (P1, 5)
                         (P2, 10)
@@ -45,24 +45,24 @@ let ``The 'Model.fireable' function should return true for transitions that are 
         T1
     |> should be True
 
-    Model.fireable model (Marking.make []) T2
+    Model.isFireable model (Marking.make []) T2
     |> should be True
 
-    Model.fireable model (Marking.make [ (P1, 1); (P2, 1) ]) T3
+    Model.isFireable model (Marking.make [ (P1, 1); (P2, 1) ]) T3
     |> should be True
 
 [<Fact>]
 let ``The 'Model.fireable' function should return false for transitions that aren't fireable`` () =
-    Model.fireable model (Marking.make [ (P1, 1); (P2, 1) ]) T1
+    Model.isFireable model (Marking.make [ (P1, 1); (P2, 1) ]) T1
     |> should be False
 
-    Model.fireable model (Marking.make [ (P1, 10); (P2, 10) ]) T1
+    Model.isFireable model (Marking.make [ (P1, 10); (P2, 10) ]) T1
     |> should be False
 
-    Model.fireable model (Marking.make [ (P2, 1) ]) T3
+    Model.isFireable model (Marking.make [ (P2, 1) ]) T3
     |> should be False
 
-    Model.fireable model (Marking.make [ (P1, 1) ]) T3
+    Model.isFireable model (Marking.make [ (P1, 1) ]) T3
     |> should be False
 
 [<Fact>]

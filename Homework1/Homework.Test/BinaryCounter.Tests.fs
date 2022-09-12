@@ -13,11 +13,11 @@ let stateSpace = Model.stateSpace model initialMarking
 
 [<Fact>]
 let ``The initial marking of the binary counter model should be the state representing number 0`` () =
-    Marking.find Bit0 initialMarking |> should equal 0
+    initialMarking[Bit0] |> should equal 0
 
-    Marking.find Bit1 initialMarking |> should equal 0
+    initialMarking[Bit1] |> should equal 0
 
-    Marking.find Bit2 initialMarking |> should equal 0
+    initialMarking[Bit2] |> should equal 0
 
 [<Fact>]
 let ``The binary counter model should reach *every* state corresponding to the numbers from 0 to 7`` () =
@@ -25,10 +25,10 @@ let ``The binary counter model should reach *every* state corresponding to the n
         for b1 in 0..1 do
             for b2 in 0..1 do
                 Set.exists
-                    (fun marking ->
-                        (Marking.find Bit0 marking) = b0
-                        && (Marking.find Bit1 marking) = b1
-                        && (Marking.find Bit2 marking) = b2)
+                    (fun (marking: Marking<Place>) ->
+                        marking[Bit0] = b0
+                        && marking[Bit1] = b1
+                        && marking[Bit2] = b2)
                     stateSpace
                 |> should be True
 

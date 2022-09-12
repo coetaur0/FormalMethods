@@ -21,7 +21,20 @@ type Token = int
 // ----- Marking ---------------------------------------------------------------------------------------------------- //
 
 /// A marking is a mapping from places to token counts.
-type Marking<'Place when 'Place: comparison> = private { Counts: Map<'Place, Token> }
+type Marking<'Place when 'Place: comparison> =
+    private
+        { Counts: Map<'Place, Token> }
+
+    /// Returns the token count associated with a given place in a marking.
+    member this.Item(place: 'Place) : Token = Map.find place this.Counts
+
+    /// Returns a string representation for a marking.
+    override this.ToString() : string =
+        let repr =
+            this.Counts
+            |> Map.fold (fun str place tokens -> str + $"{place}: {tokens}, ") "{"
+
+        repr[0 .. repr.Length - 3] + "}"
 
 [<RequireQualifiedAccess>]
 module Marking =
@@ -38,40 +51,29 @@ module Marking =
 
         { Counts = counts }
 
-    /// Returns the token count associated with a given place in a marking.
-    let find (place: 'Place) (marking: Marking<'Place>) : Token = Map.find place marking.Counts
-
-    /// Returns a new marking where the token count associated with a place has been updated to a new value.
-    let update (place: 'Place) (count: Token) (marking: Marking<'Place>) : Marking<'Place> =
+    /// Returns a new marking where the token count associated with a given place has been updated to a new value.
+    let where (place: 'Place) (count: Token) (marking: Marking<'Place>) : Marking<'Place> =
         { Counts = Map.add place count marking.Counts }
-
-    /// Returns a string representation for a marking.
-    let toString (marking: Marking<'Place>) : string =
-        let repr =
-            marking.Counts
-            |> Map.fold (fun str place tokens -> str + $"{place}: {tokens}, ") "{"
-
-        repr[0 .. repr.Length - 3] + "}"
 
 // ----- Arcs ------------------------------------------------------------------------------------------------------- //
 
 /// The pre- and post-condition functions of a Petri net are represented by sets of weighted arcs from places to
-/// transitions. The pre/post-condition functions map pairs of places and transitions to token counts.
+/// transitions. They are implemented as mappings from pairs of places and transitions to token counts.
 type Arcs<'Place, 'Transition when 'Place: comparison and 'Transition: comparison> =
     private
         { Values: Map<'Place * 'Transition, Token> }
+
+    /// Returns the token count associated with a pair of nodes in a set of arcs.
+    member this.Item(arc: 'Place * 'Transition) : Token =
+        match Map.tryFind arc this.Values with
+        | Some count -> count
+        | None -> 0
 
 [<RequireQualifiedAccess>]
 module Arcs =
 
     /// Returns a new set of arcs built from a sequence of mappings from pairs of nodes to token counts.
     let make (mappings: seq<('Place * 'Transition) * Token>) : Arcs<'Place, 'Transition> = { Values = Map(mappings) }
-
-    /// Returns the token count associated with a pair of nodes in a set of arcs.
-    let find (arc: 'Place * 'Transition) (set: Arcs<'Place, 'Transition>) : Token =
-        match Map.tryFind arc set.Values with
-        | Some count -> count
-        | None -> 0
 
 // ----- Model ------------------------------------------------------------------------------------------------------ //
 
@@ -95,43 +97,39 @@ module Model =
           Post = post }
 
     /// Returns the set of places in a model.
-    let places (model: Model<'Place, _>) : Set<'Place> = model.Places
+    let places (model: Model<'Place, 'Transition>) : Set<'Place> = model.Places
 
     /// Returns the set of transitions in a model.
-    let transitions (model: Model<_, 'Transition>) : Set<'Transition> = model.Transitions
+    let transitions (model: Model<'Place, 'Transition>) : Set<'Transition> = model.Transitions
 
     /// Checks if a transition is fireable from a given marking in a model.
-    let fireable (model: Model<'Place, 'Transition>) (marking: Marking<'Place>) (transition: 'Transition) : bool =
+    let isFireable (model: Model<'Place, 'Transition>) (marking: Marking<'Place>) (transition: 'Transition) : bool =
         model.Places
-        |> Set.forall (fun place ->
-            (Marking.find place marking)
-            - (Arcs.find (place, transition) model.Pre)
-            >= 0)
+        |> Set.forall (fun place -> marking[place] - model.Pre[place, transition] >= 0)
 
     /// Returns the set of all the transitions that are fireable from a given marking in a model.
     let getFireable (model: Model<'Place, 'Transition>) (marking: Marking<'Place>) : Set<'Transition> =
         model.Transitions
-        |> Set.filter (fireable model marking)
+        |> Set.filter (isFireable model marking)
 
-    /// Fires a transition from a given marking in a model.
-    /// Returns some new marking if the transition is fireable, or none otherwise.
+    /// Fires a transition from a given marking in a model. Returns some new marking if the transition is fireable, or
+    /// none otherwise.
     let fire
         (model: Model<'Place, 'Transition>)
         (marking: Marking<'Place>)
         (transition: 'Transition)
         : Option<Marking<'Place>> =
-        if not (fireable model marking transition) then
+        if not (isFireable model marking transition) then
             None
         else
             model.Places
             |> Set.fold
-                (fun newMarking place ->
-                    Marking.update
-                        place
-                        ((Marking.find place marking)
-                         - (Arcs.find (place, transition) model.Pre)
-                         + (Arcs.find (place, transition) model.Post))
-                        newMarking)
+                (fun (newMarking: Marking<'Place>) place ->
+                    let newCount =
+                        marking[place] - model.Pre[place, transition]
+                        + model.Post[place, transition]
+
+                    Marking.where place newCount newMarking)
                 marking
             |> Some
 
