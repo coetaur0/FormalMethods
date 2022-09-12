@@ -32,7 +32,7 @@ let pre = Arcs.make [ ((P1, T1), 1)
                       ((P2, T1), 2)
                       ((P1, T2), 1) ]
                       
-let post = Arcs.make [ ((T1, P1), 1) ]
+let post = Arcs.make [ ((P1, T1), 1) ]
 
 let model = Model.make pre post
 
@@ -62,7 +62,7 @@ let pre = Arcs.make [ ((P1, T1), 1)
                       ((P2, T1), 2)
                       ((P1, T2), 1) ]
                       
-let post = Arcs.make [ ((T1, P1), 1) ]
+let post = Arcs.make [ ((P1, T1), 1) ]
 
 let model = Model.make pre post
 

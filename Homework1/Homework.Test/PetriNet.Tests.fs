@@ -23,10 +23,10 @@ let pre =
                 ((P3, T1), 1) ]
 
 let post =
-    Arcs.make [ ((T1, P1), 1)
-                ((T2, P1), 1)
-                ((T2, P3), 1)
-                ((T3, P2), 2) ]
+    Arcs.make [ ((P1, T1), 1)
+                ((P1, T2), 1)
+                ((P3, T2), 1)
+                ((P2, T3), 2) ]
 
 let model = Model.make pre post
 

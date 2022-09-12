@@ -44,23 +44,23 @@ let pre =
 
 /// The post-condition function of the binary counter model.
 let post =
-    Arcs.make [ ((T0, Bit0), 1)
+    Arcs.make [ ((Bit0, T0), 1)
 
-                ((T1, Bit0C), 1)
-                ((T1, Bit1), 1)
+                ((Bit0C, T1), 1)
+                ((Bit1, T1), 1)
 
-                ((T2, Bit0), 1)
-                ((T2, Bit1), 1)
+                ((Bit0, T2), 1)
+                ((Bit1, T2), 1)
 
-                ((T3, Start), 1)
-                ((T3, Bit0C), 1)
-                ((T3, Bit1C), 1)
-                ((T3, Bit2), 1)
+                ((Start, T3), 1)
+                ((Bit0C, T3), 1)
+                ((Bit1C, T3), 1)
+                ((Bit2, T3), 1)
 
-                ((T4, Start), 1)
-                ((T4, Bit0C), 1)
-                ((T4, Bit1C), 1)
-                ((T4, Bit2C), 1) ]
+                ((Start, T4), 1)
+                ((Bit0C, T4), 1)
+                ((Bit1C, T4), 1)
+                ((Bit2C, T4), 1) ]
 
 /// The binary counter model.
 let model = Model.make pre post

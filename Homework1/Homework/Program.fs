@@ -17,8 +17,8 @@ let pre =
                 ((P3, T2), 2) ]
 
 let post =
-    Arcs.make [ ((T1, P1), 1)
-                ((T1, P3), 2) ]
+    Arcs.make [ ((P1, T1), 1)
+                ((P3, T1), 2) ]
 
 let model = Model.make pre post
 
@@ -38,8 +38,7 @@ printfn "# ---------------------- #"
 
 // ----- Initial marking -------------------------------------------------------------------------------------------- //
 
-let initialMarking =
-    Marking.make [ (P1, 2); (P2, 1) ]
+let initialMarking = Marking.make [ (P1, 2); (P2, 1) ]
 
 printfn $"\nInitial marking: {Marking.toString initialMarking}"
 
@@ -50,8 +49,7 @@ for transition in Model.getFireable model initialMarking do
 
 // ----- Marking after firing T1 ------------------------------------------------------------------------------------ //
 
-let newMarking =
-    Model.fire model initialMarking T1
+let newMarking = Model.fire model initialMarking T1
 
 printfn $"\nMarking after firing T1: {Marking.toString newMarking.Value}"
 
