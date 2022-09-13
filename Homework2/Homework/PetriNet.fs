@@ -78,7 +78,7 @@ module Arcs =
 // ----- Model ------------------------------------------------------------------------------------------------------ //
 
 /// A Petri net is represented by the types of its places and transitions, as well as its pre- and post-condition
-/// functions. The pre- and post-condition functions are implemented as sets of arcs.
+/// functions.
 type Model<'Place, 'Transition when 'Place: comparison and 'Transition: comparison> =
     private
         { Places: Set<'Place>
@@ -131,23 +131,3 @@ module Model =
                     Marking.where place newCount newMarking)
                 marking
             |> Some
-
-    /// Returns the complete state space of a model, starting from some marking.
-    let stateSpace (model: Model<'Place, 'Transition>) (marking: Marking<'Place>) : Set<Marking<'Place>> =
-        let getSuccessors marking =
-            getFireable model marking
-            |> Set.fold
-                (fun successors transition -> Set.add (fire model marking transition).Value successors)
-                Set.empty
-
-        let rec fixpoint space =
-            let space' =
-                space
-                |> Set.fold (fun newSpace marking -> Set.union newSpace (getSuccessors marking)) space
-
-            if space = space' then
-                space'
-            else
-                fixpoint space'
-
-        fixpoint (Set [ marking ])

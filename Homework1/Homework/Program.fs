@@ -26,7 +26,7 @@ let post =
     Arcs.make [ ((P1, T1), 1)
                 ((P3, T1), 2) ]
 
-// The token count associated with an arc from some place to some transition in a set of arcs can be accessed with
+// The token count associated with an arc from some place to some transition in a set of arcs can be accessed with the
 // indexing notation (square brackets):
 printfn $"pre(P1, T1) = {pre[P1, T1]}"
 
@@ -53,9 +53,10 @@ printfn "# ---------------------- #"
 // ----- Initial marking -------------------------------------------------------------------------------------------- //
 
 // A Petri net marking is built by calling the `make` function of the `Marking` module, as follows:
-let initialMarking = Marking.make [ (P1, 2); (P2, 1) ]
+let initialMarking =
+    Marking.make [ (P1, 2); (P2, 1) ]
 
-// The token count associated with a specific place in a marking can be accessed with indexing notation, as follows:
+// The token count associated with a specific place in a marking can be accessed with the indexing notation, as follows:
 printfn $"\ninitialMarking(P1) = {initialMarking[P1]}"
 
 printfn $"\nInitial marking: {initialMarking}"
@@ -70,7 +71,8 @@ for transition in Model.getFireable model initialMarking do
 // ----- Marking after firing T1 ------------------------------------------------------------------------------------ //
 
 // A transition is fired by calling the `fire` function in the `Model` module.
-let newMarking = Model.fire model initialMarking T1
+let newMarking =
+    Model.fire model initialMarking T1
 
 printfn $"\nMarking after firing T1: {newMarking.Value}"
 

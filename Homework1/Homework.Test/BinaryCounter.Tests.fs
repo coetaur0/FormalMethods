@@ -7,7 +7,8 @@ open PetriNet
 
 // ----- State space ------------------------------------------------------------------------------------------------ //
 
-let stateSpace = Model.stateSpace model initialMarking
+let stateSpace =
+    Model.stateSpace model initialMarking
 
 // ----- Tests ------------------------------------------------------------------------------------------------------ //
 
