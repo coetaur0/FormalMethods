@@ -8,6 +8,7 @@
   <ItemGroup>
     <Compile Include="PetriNet.fs" />
     <Compile Include="Analysis.fs" />
+    <Compile Include="Smokers.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

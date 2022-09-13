@@ -105,11 +105,15 @@ module Model =
     /// Checks if a transition is fireable from a given marking in a model.
     let isFireable (model: Model<'Place, 'Transition>) (marking: Marking<'Place>) (transition: 'Transition) : bool =
         model.Places
-        |> Set.forall (fun place -> marking[place] - model.Pre[place, transition] >= 0)
+        |> Set.forall (fun place ->
+            marking[place]
+            - model.Pre[place, transition]
+            >= 0)
 
     /// Returns the set of all the transitions that are fireable from a given marking in a model.
     let getFireable (model: Model<'Place, 'Transition>) (marking: Marking<'Place>) : Set<'Transition> =
-        model.Transitions |> Set.filter (isFireable model marking)
+        model.Transitions
+        |> Set.filter (isFireable model marking)
 
     /// Fires a transition from a given marking in a model. Returns some new marking if the transition is fireable, or
     /// none otherwise.
@@ -125,7 +129,8 @@ module Model =
             |> Set.fold
                 (fun newMarking place ->
                     let newCount =
-                        marking[place] - model.Pre[place, transition]
+                        marking[place]
+                        - model.Pre[place, transition]
                         + model.Post[place, transition]
 
                     Marking.where place newCount newMarking)
