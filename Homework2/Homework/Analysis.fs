@@ -1,6 +1,5 @@
 module Analysis
 
-open Microsoft.FSharp.Core
 open PetriNet
 
 // ----- Node ------------------------------------------------------------------------------------------------------- //
@@ -16,6 +15,8 @@ module Node =
 
     /// Returns the node computed for a given marking in some model.
     let make (model: Model<'Place, 'Transition>) (marking: Marking<'Place>) : Node<'Place, 'Transition> =
+        // The outgoing edges for a node are labelled with the transitions that are fireable from its marking. Each edge
+        // points to the marking that is obtained after firing the transition it's labelled with.
         let edges =
             Model.getFireable model marking
             |> Set.fold
@@ -44,21 +45,34 @@ module MarkingGraph =
     /// Returns the marking graph for a Petri net with some initial marking as its root.
     let make (model: Model<'Place, 'Transition>) (marking: Marking<'Place>) : MarkingGraph<'Place, 'Transition> =
         let rec fixpoint markings nodes =
+            // Compute the new nodes for the markings received as argument and add them to the set of nodes in the
+            // marking graph.
             let nodes' =
                 markings
                 |> Set.fold (fun newNodes marking -> Set.add (Node.make model marking) newNodes) nodes
 
-            let markings' =
+            // The set of markings that have already been visited by the algorithm is the set of markings that label the
+            // nodes of the graph. The set of all the successors in the graph is the union of the successors of every
+            // node in it. The two sets are computed in parallel with a fold over the nodes in the graph.
+            let visited, successors =
                 nodes'
-                |> Set.fold (fun newMarkings node -> Set.union (Node.successors node) newMarkings) markings
+                |> Set.fold
+                    (fun (visited, successors) node ->
+                        (Set.add node.Marking visited, Set.union (Node.successors node) successors))
+                    (Set.empty, Set.empty)
 
-            if Set.isEmpty (Set.difference markings' markings) then
+            // The set of markings that still need to be visited by the construction algorithm is the difference between
+            // the set of all successors and the set of markings that were already visited.
+            let markings' =
+                Set.difference successors visited
+
+            if Set.isEmpty markings' then
                 nodes'
             else
                 fixpoint markings' nodes'
 
         { Root = marking
-          Nodes = fixpoint (Set [ marking ]) Set.empty }
+          Nodes = fixpoint (Set.singleton marking) Set.empty }
 
     /// Returns the total number of nodes in a marking graph.
     let count (graph: MarkingGraph<'Place, 'Transition>) : int = Set.count graph.Nodes
@@ -73,6 +87,8 @@ module MarkingGraph =
         (graph: MarkingGraph<'Place, 'Transition>)
         : Set<Node<'Place, 'Transition>> =
         Set.filter predicate graph.Nodes
+
+// ----- Analysis functions ----------------------------------------------------------------------------------------- //
 
 /// Checks if a transition is quasi-alive in a given model for some initial marking.
 let isQuasiAlive (model: Model<'Place, 'Transition>) (marking: Marking<'Place>) (transition: 'Transition) : bool =

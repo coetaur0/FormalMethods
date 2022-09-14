@@ -41,6 +41,8 @@ module Marking =
 
     /// Returns a new marking built from a sequence of mappings from places to token counts.
     let make (mappings: seq<'Place * Token>) : Marking<'Place> =
+        // A marking is a total map, meaning that for every place in a Petri net, there is a token count in the marking.
+        // Every place that isn't initialised with a specific value is given a default token count of zero.
         let totalMap =
             getAllCases<'Place> ()
             |> Set.fold (fun zeroMap place -> Map.add place 0 zeroMap) Map.empty
