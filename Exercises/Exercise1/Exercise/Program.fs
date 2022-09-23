@@ -1,10 +1,11 @@
-﻿open FParsec
-open Core
+﻿open Core
 open Parser
 
+// The initial environment of the interpreter is empty.
 let mutable env: Map<string, Value> =
     Map.empty
 
+// The REPL (Read-Eval-Print-Loop) is executed repeatedly.
 while true do
     printf ">> "
     let cmdString = System.Console.ReadLine()

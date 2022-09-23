@@ -79,6 +79,7 @@ type Cmd =
 
 // ----- Interpreter functions -------------------------------------------------------------------------------------- //
 
+/// An error that can be encountered during the evaluation of an expression.
 exception RuntimeError of string
 
 /// Evaluates an expression to a value in some environment mapping variables to values.
