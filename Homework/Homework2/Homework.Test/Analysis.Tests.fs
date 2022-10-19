@@ -27,7 +27,7 @@ let model = Model.make pre post
 
 [<Fact>]
 let ``The 'Analysis.isQuasiAlive' function should be correctly implemented`` () =
-    isQuasiAlive model (Marking.make [ (P1, 3); (P2, 0) ]) T1
+    isQuasiAlive model (Marking.make [ (P1, 3); (P2, 0) ]) T2
     |> should be True
 
     isQuasiAlive model (Marking.make [ (P1, 0); (P2, 0) ]) T1
