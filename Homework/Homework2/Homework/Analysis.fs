@@ -4,6 +4,8 @@ open PetriNet
 
 // ----- MarkingGraph ----------------------------------------------------------------------------------------------- //
 
+/// The marking graph of a Petri net is represented by its root (a marking) and a set of edges implemented as a mapping
+/// from markings to mappings from transitions to markings.
 type MarkingGraph<'Place, 'Transition when 'Place: comparison and 'Transition: comparison> =
     { Root: Marking<'Place>
       Edges: Map<Marking<'Place>, Map<'Transition, Marking<'Place>>> }
