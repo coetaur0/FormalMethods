@@ -1,0 +1,72 @@
+\documentclass[a4paper, titlepage]{article}
+\usepackage[round, sort, numbers]{natbib}
+\usepackage[utf8]{inputenc}
+\usepackage{amsfonts, amsmath, amssymb, amsthm}
+\usepackage{color}
+\usepackage{listings}
+\usepackage{marvosym}
+\usepackage{mathtools}
+\usepackage{paralist}
+\usepackage{parskip}
+\usepackage{subfig}
+\usepackage{tikz}
+\usepackage{titlesec}
+
+\numberwithin{figure}{section}
+\numberwithin{table}{section}
+
+\usetikzlibrary{arrows, automata, backgrounds, petri, positioning}
+\tikzstyle{place}=[circle, draw=blue!50, fill=blue!20, thick]
+\tikzstyle{transition}=[rectangle, draw=black!50, fill=black!20, thick]
+
+% define new commands for sets and tuple
+\newcommand{\setof}[1]{\ensuremath{\left \{ #1 \right \}}}
+\newcommand{\tuple}[1]{\ensuremath{\left \langle #1 \right \rangle }}
+\newcommand{\card}[1]{\ensuremath{\left \vert #1 \right \vert }}
+
+\makeatletter
+\newcommand\objective[1]{\def\@objective{#1}}
+\newcommand{\makecustomtitle}{%
+	\begin{center}
+		\huge\@title \\
+		[1ex]\small Aurélien Coet, Dimitri Racordon
+	\end{center}
+	\@objective
+}
+\makeatother
+
+\begin{document}
+
+  \title{Outils formels de Modélisation \\ 4\textsuperscript{ème} séance d'exercices}
+  \author{Aurélien Coet, Dimitri Racordon}
+	\objective{
+		Dans cette séance d'exercices, nous allons consolider notre étude des propriétés inhérentes aux réseaux de Petri.
+    Notamment, nous étudierons les définitions formelles de ces propriétés.
+	}
+
+	\makecustomtitle
+
+  \section{Vous avez dit formelles ... ($\bigstar\bigstar$)}
+    Soit un réseau de Petri défini par $N=\tuple{P,T,^*\Delta,\Delta^*,M_0}$.
+		Pour chacune des propriétés exprimées formellement ci-dessous, dessinez un exemple de réseau:
+		\begin{enumerate}
+			\item $|P|=3 \wedge \exists t \in T$ tq. $\forall p \in P: \Delta^*(t,p) = 1$
+			\item $1 < \card{P} < \card{T} \wedge \forall p \in P: \forall t \in T: M \rightarrow^t M' \implies M'(p) > M(p)$
+      \item $1 < \card{P} < \card{T} \wedge \exists s \in T^*$ tq. $M \rightarrow^s M' \implies M' \rightarrow^s M$
+      \item $\forall s \in T^*: M \rightarrow^s M' \implies M \notin R(M') \wedge \nexists M' \in R(M_0)$ tq. $\forall p \in P: M'(p) = 0$
+		\end{enumerate}
+
+	\section{Electrocardiogramme [\Keyboard] ($\bigstar\bigstar\bigstar$)}
+    Soit un réseau de Petri défini par $N=\tuple{P,T,^*\Delta,\Delta^*,M_0}$.
+    On part de l'hypothèse que le réseau $N$ a nécessairement un nombre fini de marquages atteignables.
+    
+    \begin{enumerate}
+        \item Écrivez un algorithme qui prend en entrée un réseau $N$ et une transition $t \in T$, et qui retourne vrai ou faux si $t$ est respectivement vivante ou non.
+        \item Complétez la fonction \texttt{isAlive} dans le fichier \texttt{Analysis.fs} du projet \texttt{Exercise} avec une implémentation de votre algorithme.
+        \item Le fichier \texttt{Program.fs} contient une implémentation du modèle vu en cours à la page 21 des slides \textit{Présentation des propriétés}. 
+        Jouez avec le marquage initial de ce modèle et observez son influence sur la vivacité du réseau.
+        Quel est la condition nécéssaire pour que le réseau soit vivant ? 
+        \item Comment faudrait-il procéder pour que votre algorithme accepte en entrée un réseau avec un nombre de marquages potentiellement infini?
+    \end{enumerate}
+
+\end{document}
