@@ -51,6 +51,9 @@ module MarkingGraph =
             (fun markings _ successors -> Set.union (Set.ofSeq (Map.values successors)) markings)
             (Set.ofSeq (Map.keys graph.Edges))
 
+    /// Returns the total number of markings in a marking graph.
+    let count (graph: MarkingGraph<'Place, 'Transition>) : int = markings graph |> Set.count
+
     /// Returns the set of all the successor markings for some given marking in a marking graph.
     let successors (graph: MarkingGraph<'Place, 'Transition>) (marking: Marking<'Place>) : Set<Marking<'Place>> =
         let rec fixpoint markings successors =
@@ -75,13 +78,11 @@ module MarkingGraph =
 
         fixpoint (Set.singleton marking) Set.empty
 
-    /// Returns the total number of nodes in a marking graph.
-    let count (graph: MarkingGraph<'Place, 'Transition>) : int = markings graph |> Set.count
-
-    /// Checks if there exists a node (marking) in a marking graph that satisfies some predicate.
+    /// Checks if there exists a marking in a marking graph that satisfies some predicate.
     let exists (predicate: Marking<'Place> -> bool) (graph: MarkingGraph<'Place, 'Transition>) : bool =
         Set.exists predicate (markings graph)
 
+    /// Checks if all the markings in marking graph satisfy some predicate.
     let forall (predicate: Marking<'Place> -> bool) (graph: MarkingGraph<'Place, 'Transition>) : bool =
         Set.forall predicate (markings graph)
 
