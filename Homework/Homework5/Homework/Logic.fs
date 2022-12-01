@@ -4,7 +4,7 @@ open Microsoft.FSharp.Reflection
 
 // ----- Utilities -------------------------------------------------------------------------------------------------- //
 
-/// Returns the set of all the cases in a discriminated union.
+/// Returns the set of all cases in a discriminated union.
 let private getAllCases<'T when 'T: comparison> () =
     if not (FSharpType.IsUnion typeof<'T>) then
         failwith "The type for a set of propositions must be a discriminated union."
@@ -15,7 +15,7 @@ let private getAllCases<'T when 'T: comparison> () =
 
 // ----- Valuation -------------------------------------------------------------------------------------------------- //
 
-/// A valuation is a mapping from a set of propositions in first-order logic to boolean values.
+/// A valuation is a mapping from a set of propositions in propositional logic to boolean values.
 type Valuation<'Proposition when 'Proposition: comparison> =
     private
         { Values: Map<'Proposition, bool> }
@@ -34,6 +34,7 @@ type Valuation<'Proposition when 'Proposition: comparison> =
 
         repr[0 .. repr.Length - 3] + "}"
 
+[<RequireQualifiedAccess>]
 module Valuation =
 
     /// Returns a new valuation built from a mapping from propositions to boolean values. Any proposition omitted from
@@ -70,7 +71,7 @@ module Valuation =
 
 // ----- Formula ---------------------------------------------------------------------------------------------------- //
 
-/// A formula in first-order logic.
+/// A formula in propositional logic.
 type Formula<'Proposition when 'Proposition: comparison> =
     | True
     | False
@@ -80,7 +81,7 @@ type Formula<'Proposition when 'Proposition: comparison> =
     | Or of Formula<'Proposition> * Formula<'Proposition>
 
     /// Returns the negation of a formula.
-    static member (~-)(operand: Formula<'Proposition>) : Formula<'Proposition> = Not(operand)
+    static member (~-)(operand: Formula<'Proposition>) : Formula<'Proposition> = Not operand
 
     /// Returns the conjunction of two formulae.
     static member (*)(lhs: Formula<'Proposition>, rhs: Formula<'Proposition>) : Formula<'Proposition> = And(lhs, rhs)
@@ -105,6 +106,7 @@ type Formula<'Proposition when 'Proposition: comparison> =
         | And (lhs, rhs) -> $"({lhs} /\ {rhs})"
         | Or (lhs, rhs) -> $"({lhs} \/ {rhs})"
 
+[<RequireQualifiedAccess>]
 module Formula =
 
     /// Evaluates the truth of a formula, given some valuation for the propositions in it.
@@ -124,30 +126,60 @@ module Formula =
     /// Checks if a formula is a tautology.
     let isTautology (formula: Formula<'Proposition>) : bool =
         Valuation.all<'Proposition> ()
-        |> List.forall (fun valuation -> (eval formula valuation) = true)
+        |> List.forall (eval formula)
 
-    /// Transforms a formula into negative normal form (NNF).
+    /// Simplifies a formula by replacing trivial sub-formulae by their equivalences.
+    let rec simplify formula =
+        match formula with
+        | Not f ->
+            match simplify f with
+            | Not f' -> f'
+            | True -> False
+            | False -> True
+            | f' -> Not f'
+        | And (lhs, rhs) ->
+            match (simplify lhs, simplify rhs) with
+            | (True, f')
+            | (f', True) -> f'
+            | (False, _)
+            | (_, False) -> False
+            | (lhs', rhs') when lhs' = rhs' -> lhs'
+            | (lhs', rhs') when lhs' = Not(rhs') || rhs' = Not(lhs') -> False
+            | (lhs', rhs') -> And(lhs', rhs')
+        | Or (lhs, rhs) ->
+            match (simplify lhs, simplify rhs) with
+            | (True, _)
+            | (_, True) -> True
+            | (False, f')
+            | (f', False) -> f'
+            | (lhs', rhs') when lhs' = rhs' -> lhs'
+            | (lhs', rhs') when lhs' = Not(rhs') || rhs' = Not(lhs') -> True
+            | (lhs', rhs') -> Or(lhs', rhs')
+        | _ -> formula
+
+    /// Transforms a formula into negation normal form (NNF).
     let rec nnf (formula: Formula<'Proposition>) : Formula<'Proposition> =
         match formula with
         | Not f ->
             match f with
-            | Not f' -> nnf f'
-            | And (lhs, rhs) -> Or(nnf (Not lhs), nnf (Not rhs))
-            | Or (lhs, rhs) -> And(nnf (Not lhs), nnf (Not rhs))
-            | _ -> Not f
+            | And (lhs, rhs) -> nnf (Or(Not lhs, Not rhs))
+            | Or (lhs, rhs) -> nnf (And(Not lhs, Not rhs))
+            | _ -> Not(nnf f)
         | And (lhs, rhs) -> And(nnf lhs, nnf rhs)
         | Or (lhs, rhs) -> Or(nnf lhs, nnf rhs)
         | _ -> formula
+        |> simplify
 
     /// Transforms a formula into conjunctive normal form (CNF).
     let cnf (formula: Formula<'Proposition>) : Formula<'Proposition> =
-        let rec helper formula =
+        let rec cnf' formula =
             match formula with
+            | And (f, And (lhs, rhs)) -> cnf' (And(And(f, lhs), rhs))
+            | And (lhs, rhs) -> And(cnf' lhs, cnf' rhs)
+            | Or (f, Or (lhs, rhs)) -> cnf' (Or(Or(f, lhs), rhs))
             | Or (f, And (lhs, rhs))
-            | Or (And (lhs, rhs), f) -> And(Or(helper f, helper lhs), Or(helper f, helper rhs))
-            | Or (f, Or (lhs, rhs)) -> Or(Or(helper f, helper lhs), helper rhs)
-            | And (lhs, rhs) -> And(helper lhs, helper rhs)
-            | Or (lhs, rhs) -> Or(helper lhs, helper rhs)
+            | Or (And (lhs, rhs), f) -> cnf' (And(Or(f, lhs), Or(f, rhs)))
+            | Or (lhs, rhs) -> Or(cnf' lhs, cnf' rhs)
             | _ -> formula
 
-        helper (nnf formula)
+        formula |> nnf |> cnf' |> simplify
