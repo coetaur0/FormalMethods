@@ -30,7 +30,7 @@
 \newcommand{\makecustomtitle}{%
 	\begin{center}
 		\huge\@title \\
-		[1ex]\small Dimitri Racordon \\
+		[1ex]\small Aurélien Coet, Dimitri Racordon \\
 	\end{center}
 	\@objective
 }
@@ -39,7 +39,7 @@
 \begin{document}
 
   \title{Outils formels de Modélisation \\ 10\textsuperscript{ème} séance d'exercices}
-  \author{Dimitri Racordon}
+  \author{Aurélien Coet, Dimitri Racordon}
 	\objective{Dans cette séance d'exercices, nous allons étudier les bases de la logique propositionnelle, notamment en nous intéressant aux équivalences sémantiques.}
 
 	\makecustomtitle
@@ -73,14 +73,14 @@
       \item $(\alpha \lor \beta) \land (\lnot\alpha \lor \gamma)
               \equiv (\lnot\alpha \land \beta) \lor (\gamma \land (\alpha \lor \beta))$
       \item $(\alpha \lor \beta) \implies \lnot\gamma
-              \equiv \lnot((\alpha \lor \gamma) \land (\beta \lor \gamma))$
+              \equiv \lnot((\alpha \land \gamma) \lor (\beta \land \gamma))$
     \end{enumerate}
 
   \section{Exclusivité ($\bigstar\bigstar\bigstar$)}
     Donnez une formule de logique propositionnelle équivalente à la ligne de code suivante,
-    écrite en Swift:
+    écrite en F\#:
     \begin{verbatim}
-      if(a != b) { c = true } else { c = false }
+      let c = if a <> b then true else false
     \end{verbatim}
 
 \end{document}
