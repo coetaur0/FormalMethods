@@ -28,10 +28,7 @@ let ``The 'Logic.Formula.isTautology' function should return 'true' for tautolog
     )
     |> should equal true
 
-    Formula.isTautology (
-        (-(Prop A) + (Prop B))
-        <=> ((Prop A) => (Prop B))
-    )
+    Formula.isTautology ((-(Prop A) + (Prop B)) <=> ((Prop A) => (Prop B)))
     |> should equal true
 
     Formula.isTautology (
@@ -56,41 +53,32 @@ let ``The 'Logic.Formula.nnf' function should be correctly implemented`` () =
     Formula.nnf (-((Prop B) * (Prop C)))
     |> should equal (-(Prop B) + -(Prop C))
 
-    Formula.nnf (
-        (-(Prop A) + (Prop B))
-        + -((Prop A) * (Prop C))
-    )
-    |> should
-        equal
-        ((-(Prop A) + (Prop B))
-         + (-(Prop A) + -(Prop C)))
+    Formula.nnf ((-(Prop A) + (Prop B)) + -((Prop A) * (Prop C)))
+    |> should equal ((-(Prop A) + (Prop B)) + (-(Prop A) + -(Prop C)))
 
     Formula.nnf -((-(Prop A) + False) * (Prop C * True))
     |> should equal ((Prop A) + -(Prop C))
 
 [<Fact>]
 let ``The 'Logic.Formula.cnf' function should be correctly implemented`` () =
-    Formula.cnf ((Prop A) + ((Prop B) * -(Prop C)))
-    |> should
-        equal
-        (((Prop A) + (Prop B))
-         * ((Prop A) + -(Prop C)))
+    [(((Prop A) + (Prop B)) * ((Prop A) + -(Prop C)))
+     (((Prop A) + (Prop B)) * (-(Prop C) + (Prop A)))
+     (((Prop B) + (Prop A)) * ((Prop A) + -(Prop C)))
+     (((Prop B) + (Prop A)) * (-(Prop C) + (Prop A)))]
+    |> should contain (Formula.cnf ((Prop A) + ((Prop B) * -(Prop C))))
 
-    Formula.cnf (
-        -((Prop A) + -(Prop C))
-        + (Prop B) * (Prop A)
-    )
-    |> should
-        equal
-        (((Prop B) + -(Prop A))
-         * ((Prop B) + (Prop C))
-         * ((Prop A) + (Prop C)))
+    [ (((Prop B) + -(Prop A)) * ((Prop B) + (Prop C)) * ((Prop A) + (Prop C)))
+      (((Prop B) + -(Prop A)) * ((Prop C) + (Prop B)) * ((Prop A) + (Prop C)))
+      (((Prop B) + -(Prop A)) * ((Prop B) + (Prop C)) * ((Prop C) + (Prop A)))
+      (((Prop B) + -(Prop A)) * ((Prop C) + (Prop B)) * ((Prop C) + (Prop A)))
+      ((-(Prop A) + (Prop B)) * ((Prop B) + (Prop C)) * ((Prop A) + (Prop C)))
+      ((-(Prop A) + (Prop B)) * ((Prop C) + (Prop B)) * ((Prop A) + (Prop C)))
+      ((-(Prop A) + (Prop B)) * ((Prop B) + (Prop C)) * ((Prop C) + (Prop A)))
+      ((-(Prop A) + (Prop B)) * ((Prop C) + (Prop B)) * ((Prop C) + (Prop A))) ]
+    |> should contain (Formula.cnf (-((Prop A) + -(Prop C)) + (Prop B) * (Prop A)))
 
-    Formula.cnf (
-        (Prop A)
-        + (-(False + (Prop B)) * (Prop C))
-    )
-    |> should
-        equal
-        (((Prop A) + -(Prop B))
-         * ((Prop A) + (Prop C)))
+    [(((Prop A) + -(Prop B)) * ((Prop A) + (Prop C)))
+     (((Prop A) + -(Prop B)) * ((Prop C) + (Prop A)))
+     ((-(Prop B) + (Prop A)) * ((Prop A) + (Prop C)))
+     ((-(Prop B) + (Prop A)) * ((Prop C) + (Prop A)))]
+    |> should contain (Formula.cnf ((Prop A) + (-(False + (Prop B)) * (Prop C))))
